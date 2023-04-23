@@ -1,43 +1,40 @@
+import os
+
 from fastapi import FastAPI, HTTPException
-import docker
 from pathlib import Path
+import subprocess
+
+from cmd_process import Cmd_process
 
 app = FastAPI(docs_url="/api/docs", redoc_url=None)
-client = docker.from_env()
-
-
-def get_output_name(prog: str):
-    return "".join(prog.split())
+is_running:bool = False
+process  = Cmd_process()
 
 
 @app.post("/api/phoronix-perf")
 async def actions_with_phoronix_perf_process(option: str):
-    job = "phoronix-test-suite batch-run  perf-bench"
-    job_in_containers = client.containers.list(filters={'name': job})
+    job = "phoronix-test-suite batch-run  compress-7zip"
+    global process
     if option == "start":
-        if len(job_in_containers) != 0:
+        if is_running:
             raise HTTPException(status_code=400, detail="Job is already running!")
-        client.containers.run("testbench", command=job + " > " + get_output_name(job), name=job, detach=True)
+        process.start(job)
     elif option == "stop":
-        if len(job_in_containers) < 1:
-            raise HTTPException(status_code=400, detail="Job is no running!")
-        job_in_containers[0].stop()
+        if  not process.isRunning:
+            raise HTTPException(status_code=400, detail="Job is not running!")
+        process.stop()
     else:
         raise HTTPException(status_code=400, detail="Invalid option is given")
 
 
 @app.get("api/phoronix-perf")
 async def status_phoronix_perf_process():
-    job = "phoronix-test-suite batch-run  perf-bench"
-    job_in_containers = client.containers.list(filters={'name': job})
-    if len(job_in_containers) != 0:
-        return {1:1}
-    else:
-        return {0:0}
+    global process
+    return process.stat()
 
 
 @app.get("/api/phoronix-perf/result")
 async def result_phoronix_perf_process():
-    job = "phoronix-test-suite batch-run  perf-bench"
-    return  Path(get_output_name(job)).read_text()
+    global process
+    return
 

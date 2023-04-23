@@ -2,7 +2,7 @@
 
 ## Описание работы и запуска
 
-В качестве процесса было принято решение запускать <code>perf-bench</code>
+В качестве процесса было принято решение запускать <code> compress-7zip</code>
 от <code>phoronix-test-suite</code>.
 Все зависимости кроме него, требуемые для запуска сервера лежат [тут](requirements.txt).
 Сам же <code>phoronix-test-suite</code> устанавливается через <code>[Dockerfile](Dockerfile)</code>
