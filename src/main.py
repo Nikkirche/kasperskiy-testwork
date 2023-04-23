@@ -1,11 +1,11 @@
-import os
 from typing import Final
 
 from fastapi import FastAPI, HTTPException
 from pathlib import Path
 
-from cmdprocess import CmdProcess, file_name
-from models import Result
+from .cmdprocess import CmdProcess
+from .models import Result
+from .utils import file_name
 
 app = FastAPI(docs_url="/api/docs", redoc_url=None)
 process = CmdProcess()
@@ -27,7 +27,7 @@ async def actions_with_7z(option: str):
         process.stop()
     else:
         raise HTTPException(status_code=400, detail="Invalid option is given")
-    return {"status", "Successful"}
+    return {"status": "Successful"}
 
 
 @app.get("/api/7z")
@@ -41,8 +41,8 @@ async def result_7z_process():
     global process
     out_path = Path(file_name(job, "out"))
     err_path = Path(file_name(job, "err"))
-
-    if not (out_path.exists() or err_path.exists):
+    if not (out_path.exists() or err_path.exists()):
         raise HTTPException(status_code=404, detail="No results")
-
-    return Result(output=out_path.read_text(), err=err_path.read_text())
+    out = out_path.read_text()if out_path.exists() else None
+    err = err_path.read_text()if err_path.exists() else None
+    return Result(output=out, err=err)

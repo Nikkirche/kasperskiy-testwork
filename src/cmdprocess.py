@@ -1,11 +1,14 @@
 import os
+import resource
 import signal
 import subprocess
 import time
 from pathlib import Path
 
-from models import DetailsStat, Stat
-from utils import file_name
+import psutil as psutil
+
+from .models import DetailsStat, Stat
+from .utils import file_name
 
 
 class CmdProcess:
@@ -33,6 +36,9 @@ class CmdProcess:
     def stat(self):
         if self.isRunning:
             return Stat(isRunning=self.isRunning,
-                        details=DetailsStat(time=str(time.time() - self.start_time) + " Seconds"))
+                        details=DetailsStat(time=time.time() - self.start_time,
+                                            memory=
+                                            resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024),
+                        system_time=psutil.Process(self.command.pid).cpu_times().system.is_integer())
         else:
             return Stat(isRunning=self.isRunning)

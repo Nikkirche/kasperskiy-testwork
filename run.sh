@@ -1,2 +1,2 @@
-rm  -r result
-uvicorn main:app
+docker image build -t test_api .
+docker run  --network="host" test_api:latest
