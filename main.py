@@ -5,7 +5,9 @@ from fastapi import FastAPI, HTTPException
 from pathlib import Path
 import subprocess
 
-from cmd_process import Cmd_process
+from pydantic.main import BaseModel
+
+from cmd_process import Cmd_process, file_name
 
 app = FastAPI(docs_url="/api/docs", redoc_url=None)
 process = Cmd_process()
@@ -35,7 +37,18 @@ async def status_7z():
     return process.stat()
 
 
+class Result(BaseModel):
+    output: str | None = None
+    err: str | None = None
+
+
 @app.get("/api/7z/result")
 async def result_7z_process():
     global process
-    return
+    out_path = Path(file_name(job, "out"))
+    err_path = Path(file_name(job, "err"))
+
+    if not (out_path.exists() or err_path.exists):
+        raise HTTPException(status_code=404, detail="No results")
+
+    return Result(output=out_path.read_text(), err=err_path.read_text())
