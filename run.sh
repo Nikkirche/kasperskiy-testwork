@@ -1,3 +1,2 @@
-docker pull phoronix/pts
-#docker image build  -t testbench .
+rm  -r result
 uvicorn main:app

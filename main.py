@@ -1,4 +1,5 @@
 import os
+from typing import Final
 
 from fastapi import FastAPI, HTTPException
 from pathlib import Path
@@ -7,34 +8,34 @@ import subprocess
 from cmd_process import Cmd_process
 
 app = FastAPI(docs_url="/api/docs", redoc_url=None)
-is_running:bool = False
-process  = Cmd_process()
+process = Cmd_process()
+job: Final[str] = "7z b 3"
 
 
-@app.post("/api/phoronix-perf")
-async def actions_with_phoronix_perf_process(option: str):
-    job = "phoronix-test-suite batch-run  compress-7zip"
+@app.post("/api/7z")
+async def actions_with_7z(option: str):
     global process
+    global job
     if option == "start":
-        if is_running:
+        if process.isRunning:
             raise HTTPException(status_code=400, detail="Job is already running!")
+
         process.start(job)
     elif option == "stop":
-        if  not process.isRunning:
+        if not process.isRunning:
             raise HTTPException(status_code=400, detail="Job is not running!")
         process.stop()
     else:
         raise HTTPException(status_code=400, detail="Invalid option is given")
 
 
-@app.get("api/phoronix-perf")
-async def status_phoronix_perf_process():
+@app.get("/api/7z")
+async def status_7z():
     global process
     return process.stat()
 
 
-@app.get("/api/phoronix-perf/result")
-async def result_phoronix_perf_process():
+@app.get("/api/7z/result")
+async def result_7z_process():
     global process
     return
-
