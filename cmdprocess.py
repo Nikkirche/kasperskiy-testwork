@@ -3,25 +3,12 @@ import signal
 import subprocess
 import time
 from pathlib import Path
-from subprocess import Popen
 
-from pydantic.main import BaseModel
-
-
-def file_name(job: str, otype: str):
-    return "result/" + "".join(job.split()) + otype + ".txt"
+from models import DetailsStat, Stat
+from utils import file_name
 
 
-class DetailsStat(BaseModel):
-    time: str
-
-
-class Stat(BaseModel):
-    isRunning: bool
-    details: DetailsStat | None = None
-
-
-class Cmd_process:
+class CmdProcess:
 
     def __init__(self):
         self.command = None

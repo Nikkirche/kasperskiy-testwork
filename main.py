@@ -3,14 +3,12 @@ from typing import Final
 
 from fastapi import FastAPI, HTTPException
 from pathlib import Path
-import subprocess
 
-from pydantic.main import BaseModel
-
-from cmd_process import Cmd_process, file_name
+from cmdprocess import CmdProcess, file_name
+from models import Result
 
 app = FastAPI(docs_url="/api/docs", redoc_url=None)
-process = Cmd_process()
+process = CmdProcess()
 job: Final[str] = "7z b 3"
 
 
@@ -29,17 +27,13 @@ async def actions_with_7z(option: str):
         process.stop()
     else:
         raise HTTPException(status_code=400, detail="Invalid option is given")
+    return {"status", "Successful"}
 
 
 @app.get("/api/7z")
 async def status_7z():
     global process
     return process.stat()
-
-
-class Result(BaseModel):
-    output: str | None = None
-    err: str | None = None
 
 
 @app.get("/api/7z/result")
