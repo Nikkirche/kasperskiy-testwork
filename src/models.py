@@ -9,7 +9,7 @@ class Result(BaseModel):
 class DetailsStat(BaseModel):
     time: float
     memory: int
-    system_time: int
+    system_time: float
 
 
 class Stat(BaseModel):

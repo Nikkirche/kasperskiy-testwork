@@ -38,7 +38,7 @@ class CmdProcess:
             return Stat(isRunning=self.isRunning,
                         details=DetailsStat(time=time.time() - self.start_time,
                                             memory=
-                                            resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024),
-                        system_time=psutil.Process(self.command.pid).cpu_times().system.is_integer())
+                                            resource.getrusage(resource.RUSAGE_SELF).ru_maxrss / 1024,
+                        system_time=psutil.Process(self.command.pid).cpu_times().system))
         else:
             return Stat(isRunning=self.isRunning)
